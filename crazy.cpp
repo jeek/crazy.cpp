@@ -208,8 +208,8 @@ int main(void) {
             }
             mainqueue.push(temp);
         }
-        bool good = true;
 #ifdef DISCARDDUPES
+        bool good = true;
         while (good & !mainqueue.empty()) {
             if (current.elements.size() != mainqueue.top().elements.size()) {
                 good = false;
