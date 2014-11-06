@@ -7,6 +7,7 @@
 
 #define UPPERLIMIT 1000000000
 #define SUBTRACTION
+#define DIVISION
 #define CONCATENATION
 #define DISCARDDUPES
 #define SHOWNEGATIVES
@@ -188,22 +189,27 @@ int main(void) {
 
 #ifdef DIVISION
             // Division
-            if (current.elements[i + 1] != 0 & current.elements[i] % current.elements[i + 1] == 0) {
-                temp = queueelement();
-                temp.elements.clear();
-                temp.strings.clear();
-                for (int j = 0 ; j + 1 < current.elements.size() ; j++) {
-                    if (j < i) {
-                        temp.elements.push_back(current.elements[j]);
-                        temp.strings.push_back(current.strings[j]);
-                    } else {
-                        if (j == i) {
-                            temp.elements.push_back(current.elements[j] / current.elements[j + 1]);
-                            temp.strings.push_back("(" + current.strings[j] + " / " + current.strings[j + 1] + ")");
+//            std::cout << "i " << current.elements[i] << " " << current.elements[i+1] << std::endl;
+            if ((current.elements[i + 1]) != 0) {
+                if (current.elements[i] % current.elements[i + 1] == 0) {
+                    temp = queueelement();
+                    temp.elements.clear();
+                    temp.strings.clear();
+                    for (int j = 0 ; j + 1 < current.elements.size() ; j++) {
+                        if (j < i) {
+                            temp.elements.push_back(current.elements[j]);
+                            temp.strings.push_back(current.strings[j]);
                         } else {
-                            if (j + 1 > i) {
-                                temp.elements.push_back(current.elements[j + 1]);
-                                temp.strings.push_back(current.strings[j + 1]);
+                            if (j == i) {
+//                                std::cout << "j " << current.elements[j] << " " << current.elements[j+1] << std::endl;
+//                                std::cout << current.elements[j] / current.elements[j + 1] << std::endl;
+                                temp.elements.push_back(current.elements[j] / current.elements[j + 1]);
+                                temp.strings.push_back("(" + current.strings[j] + " / " + current.strings[j + 1] + ")");
+                            } else {
+                                if (j + 1 > i) {
+                                    temp.elements.push_back(current.elements[j + 1]);
+                                    temp.strings.push_back(current.strings[j + 1]);
+                                }
                             }
                         }
                     }
@@ -212,7 +218,7 @@ int main(void) {
             mainqueue.push(temp);
 #endif /* DIVISION */
             // Exponents
-            if (abs(current.elements[i+1]) * log10(abs(current.elements[i])) < log10(UPPERLIMIT)) {
+            if (current.elements[i+1] >=0 & abs(current.elements[i+1]) * log10(abs(current.elements[i])) < log10(UPPERLIMIT)) {
                 temp = queueelement();
                 temp.elements.clear();
                 temp.strings.clear();
