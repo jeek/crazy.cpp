@@ -7,7 +7,7 @@
 
 #define UPPERLIMIT 1000000
 #define SUBTRACTION
-#define CONCATENTATION
+#define CONCATENATION
 struct queueelement {
     std::vector< long long > elements;
     std::vector<std::string> strings;
