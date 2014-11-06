@@ -27,12 +27,16 @@ int main(void) {
     std::priority_queue< queueelement > mainqueue;
     queueelement temp;
     std::string tempstring;
-    std::vector< long long > elements(9, 0);
+    std::vector< long long > elements;
+    elements.clear();
     int i = 0;
-    for (std::vector<long long>::iterator it = elements.begin() ; it != elements.end() ; ++it) {
-        i += 1;
-        *it += i;
+    while (std::cin >> i) {
+        elements.push_back(i);
     }
+//    for (std::vector<long long>::iterator it = elements.begin() ; it != elements.end() ; ++it) {
+//        i += 1;
+//        *it += i;
+//    }
     temp.elements = elements;
     temp.strings.clear();
     i = 0;
