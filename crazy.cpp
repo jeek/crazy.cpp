@@ -184,6 +184,31 @@ int main(void) {
             }
             mainqueue.push(temp);
 
+#ifdev DIVISION
+            // Division
+            if (current.elements[i + 1] != 0 & current.elements[i] % current.elements[i + 1] == 0) {
+                temp = queueelement();
+                temp.elements.clear();
+                temp.strings.clear();
+                for (int j = 0 ; j + 1 < current.elements.size() ; j++) {
+                    if (j < i) {
+                        temp.elements.push_back(current.elements[j]);
+                        temp.strings.push_back(current.strings[j]);
+                    } else {
+                        if (j == i) {
+                            temp.elements.push_back(current.elements[j] / current.elements[j + 1]);
+                            temp.strings.push_back("(" + current.strings[j] + " / " + current.strings[j + 1] + ")");
+                        } else {
+                            if (j + 1 > i) {
+                                temp.elements.push_back(current.elements[j + 1]);
+                                temp.strings.push_back(current.strings[j + 1]);
+                            }
+                        }
+                    }
+                }
+            }
+            mainqueue.push(temp);
+#endif /* DIVISION */
             // Exponents
             if (abs(current.elements[i+1]) * log10(abs(current.elements[i])) < log10(UPPERLIMIT)) {
                 temp = queueelement();
