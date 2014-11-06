@@ -7,7 +7,7 @@
 
 #define UPPERLIMIT 1000000
 #define SUBTRACTION
-
+#define CONCATENTATION
 struct queueelement {
     std::vector< long long > elements;
     std::vector<std::string> strings;
@@ -25,20 +25,33 @@ struct queueelement {
     }
 } ;
 
+long long concatenatenumber(long long a, long long b) {
+    long long temp = 0;
+    b *= 10;
+    b += 1;
+    while (b > 0) {
+        temp *= 10;
+        temp += b % 10;
+        b /= 10;
+    }
+    while (temp > 0) {
+        a *= 10;
+        a += temp % 10;
+        temp /= 10;
+    }
+    return a / 10;
+}
+
 int main(void) {
     std::priority_queue< queueelement > mainqueue;
     queueelement temp;
     std::string tempstring;
     std::vector< long long > elements;
     elements.clear();
-    int i = 0;
+    int i = 0; int j = 0;
     while (std::cin >> i) {
         elements.push_back(i);
     }
-//    for (std::vector<long long>::iterator it = elements.begin() ; it != elements.end() ; ++it) {
-//        i += 1;
-//        *it += i;
-//    }
     temp.elements = elements;
     temp.strings.clear();
     i = 0;
@@ -47,6 +60,38 @@ int main(void) {
         temp.strings.push_back(tempstring);
     }
     mainqueue.push(temp);
+#ifdef CONCATENATION
+    // Concatenation
+    std::vector< queueelement > concatqueue;
+    concatqueue.push_back(temp);
+    while (! concatqueue.empty()) {
+        queueelement current = concatqueue.back();
+        concatqueue.pop_back();
+        for (int i = 0 ; i + 1 < current.elements.size() ; i++) {
+            temp = queueelement();
+            temp.elements.clear();
+            temp.strings.clear();
+            for (int j = 0 ; j + 1 < current.elements.size() ; j++) {
+                if (j < i) {
+                    temp.elements.push_back(current.elements[j]);
+                    temp.strings.push_back(current.strings[j]);
+                } else {
+                    if (j == i) {
+                        temp.elements.push_back(concatenatenumber(current.elements[j], current.elements[j + 1]));
+                        temp.strings.push_back(current.strings[j] + current.strings[j + 1]);
+                    } else {
+                        if (j + 1 > i) {
+                            temp.elements.push_back(current.elements[j + 1]);
+                            temp.strings.push_back(current.strings[j + 1]);
+                        }
+                    }
+                }
+            }
+            mainqueue.push(temp);
+            concatqueue.push_back(temp);
+        }
+    }
+#endif /* CONCATENATION */
     while (! mainqueue.empty()) {
         queueelement current = mainqueue.top();
         mainqueue.pop();
