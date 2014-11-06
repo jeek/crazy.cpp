@@ -8,6 +8,8 @@
 #define UPPERLIMIT 1000000
 #define SUBTRACTION
 #define CONCATENATION
+#define DISCARDDUPES
+
 struct queueelement {
     std::vector< long long > elements;
     std::vector<std::string> strings;
@@ -201,6 +203,7 @@ int main(void) {
             mainqueue.push(temp);
         }
         bool good = true;
+#ifdef DISCARDDUPES
         while (good & !mainqueue.empty()) {
             if (current.elements.size() != mainqueue.top().elements.size()) {
                 good = false;
@@ -215,5 +218,6 @@ int main(void) {
                 }
             }
         }
+#endif /* DISCARDDUPES */
     }
 }
