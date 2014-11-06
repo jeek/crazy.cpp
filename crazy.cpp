@@ -5,7 +5,7 @@
 #include <sstream>
 #include <stdlib.h>
 
-#define UPPERLIMIT 1000000
+#define UPPERLIMIT 1000
 #define SUBTRACTION
 #define CONCATENATION
 #define DISCARDDUPES
@@ -184,7 +184,7 @@ int main(void) {
             }
             mainqueue.push(temp);
 
-#ifdev DIVISION
+#ifdef DIVISION
             // Division
             if (current.elements[i + 1] != 0 & current.elements[i] % current.elements[i + 1] == 0) {
                 temp = queueelement();
