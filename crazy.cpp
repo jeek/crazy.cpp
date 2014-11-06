@@ -4,7 +4,9 @@
 #include <math.h>    // pow
 #include <sstream>
 #include <stdlib.h>
+
 #define UPPERLIMIT 1000000
+#define SUBTRACTION
 
 struct queueelement {
     std::vector< long long > elements;
@@ -80,8 +82,33 @@ int main(void) {
                 }
             }
             mainqueue.push(temp);
+
+#ifdef SUBTRACTION
+            // Subtraction
+            temp = queueelement();
+            temp.elements.clear() ;
+            temp.strings.clear();
+            for (int j = 0 ; j + 1 < current.elements.size() ; j++) {
+                if (j < i) {
+                    temp.elements.push_back(current.elements[j]);
+                    temp.strings.push_back(current.strings[j]);
+                } else {
+                    if (j == i) {
+                        temp.elements.push_back(current.elements[j] - current.elements[j + 1]);
+                        temp.strings.push_back("(" + current.strings[j] + " - " + current.strings[j + 1] + ")");
+                    } else {
+                        if (j + 1 > i) {
+                            temp.elements.push_back(current.elements[j + 1]);
+                            temp.strings.push_back(current.strings[j + 1]);
+                        }
+                    }
+                }
+            }
+            mainqueue.push(temp);
+
+#endif /* SUBTRACTION */
             // Multiplication
-            if (log10(current.elements[i+1]) + log10(current.elements[i]) < log10(UPPERLIMIT)) {
+            if (log10(abs(current.elements[i+1])) + log10(abs(current.elements[i])) < log10(UPPERLIMIT)) {
                 temp = queueelement();
                 temp.elements.clear();
                 temp.strings.clear();
@@ -103,8 +130,9 @@ int main(void) {
                 }
             }
             mainqueue.push(temp);
+
             // Exponents
-            if (current.elements[i+1] * log10(current.elements[i]) < log10(UPPERLIMIT)) {
+            if (abs(current.elements[i+1]) * log10(abs(current.elements[i])) < log10(UPPERLIMIT)) {
                 temp = queueelement();
                 temp.elements.clear();
                 temp.strings.clear();
