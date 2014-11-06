@@ -5,7 +5,7 @@
 #include <sstream>
 #include <stdlib.h>
 
-#define UPPERLIMIT 1000
+#define UPPERLIMIT 1000000000
 #define SUBTRACTION
 #define CONCATENATION
 #define DISCARDDUPES
@@ -90,8 +90,10 @@ int main(void) {
                     }
                 }
             }
-            mainqueue.push(temp);
-            concatqueue.push_back(temp);
+            if (temp.strings.size() > 1) {
+                mainqueue.push(temp);
+                concatqueue.push_back(temp);
+            }
         }
     }
 #endif /* CONCATENATION */
