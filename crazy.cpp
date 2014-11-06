@@ -9,6 +9,7 @@
 #define SUBTRACTION
 #define CONCATENATION
 #define DISCARDDUPES
+#define SHOWNEGATIVES
 
 struct queueelement {
     std::vector< long long > elements;
@@ -97,7 +98,12 @@ int main(void) {
     while (! mainqueue.empty()) {
         queueelement current = mainqueue.top();
         mainqueue.pop();
+#ifdef SHOWNEGATIVES
         if (current.elements.size() == 1 & current.elements[0] < UPPERLIMIT & current.elements[0] > -UPPERLIMIT) {
+#endif /* SHOWNEGATIVES */
+#ifndef SHOWNEGATIVES
+        if (current.elements.size() == 1 & current.elements[0] < UPPERLIMIT & current.elements[0] >= 0) {
+#endif /* SHOWNEGATIVES */
             for (std::vector<long long>::iterator it = current.elements.begin() ; it != current.elements.end() ; ++it) {
                 std::cout << *it << " ";
             }
