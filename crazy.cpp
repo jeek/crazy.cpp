@@ -1,3 +1,5 @@
+#include <set>       // std::set
+#include <algorithm> // std::sort
 #include <iostream>  // std::cout
 #include <vector>    // std::vector
 #include <queue>     // std::priority_queue
@@ -5,7 +7,7 @@
 #include <sstream>
 #include <stdlib.h>
 
-#define UPPERLIMIT 1000000000
+#define UPPERLIMIT 1000000
 #define SUBTRACTION
 #define DIVISION
 #define CONCATENATION
@@ -15,7 +17,7 @@
 
 #ifdef SQUAREROOT
 bool is_perfect_square(int n) {
-    if (n < 0 or n == 1) // in this program, we don't care about 1
+    if (n <= 1) // in this program, we don't care about 0 or 1
         return false;
     int root(round(sqrt(n)));
     return (n == root * root) | (n == (root + 1) * (root + 1));
@@ -30,12 +32,36 @@ struct queueelement {
         if (elements.size() != rhs.elements.size()) {
             return elements.size() < rhs.elements.size();
         }
+//        for (int i = 0 ; i < elements.size() ; i++) {
+//            if (abs(elements[i]) != abs(rhs.elements[i])) {
+//                return abs(elements[i]) > abs(rhs.elements[i]);
+//            }
+//        }
         for (int i = 0 ; i < elements.size() ; i++) {
             if (elements[i] != rhs.elements[i]) {
                 return elements[i] > rhs.elements[i];
             }
         }
+//        size_t a = 0; size_t b = 0;
+//        for (int i = 0 ; i < strings.size() ; i++) {
+//            a += std::count(strings[i].begin(), strings[i].end(), '-');
+//            b += std::count(rhs.strings[i].begin(), rhs.strings[i].end(), '-');
+//        }
+//        if (a != b)
+//            return a < b;
         return elements[0] < rhs.elements[0];
+    }
+    bool operator==(const queueelement& rhs) const
+    {
+        if (elements.size() != rhs.elements.size()) {
+            return false;
+        }
+        for (int i = 0 ; i < elements.size() ; i++) {
+            if (elements[i] != rhs.elements[i]) {
+                return false;
+            }
+        }
+        return true;
     }
 } ;
 
@@ -57,6 +83,7 @@ long long concatenatenumber(long long a, long long b) {
 }
 
 int main(void) {
+    std::set< long long > seen;
     std::priority_queue< queueelement > mainqueue;
     queueelement temp;
     std::string tempstring;
@@ -104,19 +131,23 @@ int main(void) {
             if (temp.strings.size() > 1) {
                 mainqueue.push(temp);
                 concatqueue.push_back(temp);
+//                std::sort(concatqueue.begin(), concatqueue.end());
+                std::unique(concatqueue.begin(), concatqueue.end());
             }
         }
     }
 #endif /* CONCATENATION */
     while (! mainqueue.empty()) {
         queueelement current = mainqueue.top();
+//        std::cout << mainqueue.size() << " " << current.elements.size() << std::endl;
         mainqueue.pop();
 #ifdef SHOWNEGATIVES
-        if (current.elements.size() == 1 & current.elements[0] < UPPERLIMIT & current.elements[0] > -UPPERLIMIT) {
+        if (current.elements.size() == 1 & current.elements[0] < UPPERLIMIT & current.elements[0] > -UPPERLIMIT & seen.count(current.elements[0]) == 0) {
 #endif /* SHOWNEGATIVES */
 #ifndef SHOWNEGATIVES
-        if (current.elements.size() == 1 & current.elements[0] < UPPERLIMIT & current.elements[0] >= 0) {
+        if (current.elements.size() == 1 & current.elements[0] < UPPERLIMIT & current.elements[0] >= 0 & seen.count(current.elements[0]) == 0) {
 #endif /* SHOWNEGATIVES */
+            seen.insert(current.elements[0]);
             for (std::vector<long long>::iterator it = current.elements.begin() ; it != current.elements.end() ; ++it) {
                 std::cout << *it << " ";
             }
@@ -230,26 +261,22 @@ int main(void) {
 #ifdef DIVISION
             // Division
 //            std::cout << "i " << current.elements[i] << " " << current.elements[i+1] << std::endl;
-            if ((current.elements[i + 1]) != 0) {
-                if (current.elements[i] % current.elements[i + 1] == 0) {
-                    temp = queueelement();
-                    temp.elements.clear();
-                    temp.strings.clear();
-                    for (int j = 0 ; j + 1 < current.elements.size() ; j++) {
-                        if (j < i) {
-                            temp.elements.push_back(current.elements[j]);
-                            temp.strings.push_back(current.strings[j]);
+            if ((current.elements[i + 1]) != 0 and current.elements[i] % current.elements[i + 1] == 0) {
+                temp = queueelement();
+                temp.elements.clear();
+                temp.strings.clear();
+                for (int j = 0 ; j + 1 < current.elements.size() ; j++) {
+                    if (j < i) {
+                        temp.elements.push_back(current.elements[j]);
+                        temp.strings.push_back(current.strings[j]);
+                    } else {
+                        if (j == i) {
+                            temp.elements.push_back(current.elements[j] / current.elements[j + 1]);
+                            temp.strings.push_back("(" + current.strings[j] + " / " + current.strings[j + 1] + ")");
                         } else {
-                            if (j == i) {
-//                                std::cout << "j " << current.elements[j] << " " << current.elements[j+1] << std::endl;
-//                                std::cout << current.elements[j] / current.elements[j + 1] << std::endl;
-                                temp.elements.push_back(current.elements[j] / current.elements[j + 1]);
-                                temp.strings.push_back("(" + current.strings[j] + " / " + current.strings[j + 1] + ")");
-                            } else {
-                                if (j + 1 > i) {
-                                    temp.elements.push_back(current.elements[j + 1]);
-                                    temp.strings.push_back(current.strings[j + 1]);
-                                }
+                            if (j + 1 > i) {
+                                temp.elements.push_back(current.elements[j + 1]);
+                                temp.strings.push_back(current.strings[j + 1]);
                             }
                         }
                     }
@@ -282,20 +309,8 @@ int main(void) {
             mainqueue.push(temp);
         }
 #ifdef DISCARDDUPES
-        bool good = true;
-        while (good & !mainqueue.empty()) {
-            if (current.elements.size() != mainqueue.top().elements.size()) {
-                good = false;
-            } else {
-                for (int i = 0 ; i < current.elements.size() ; i++) {
-                    if (current.elements[i] != mainqueue.top().elements[i]) {
-                        good = false;
-                    }
-                }
-                if (good) {
-                    mainqueue.pop();
-                }
-            }
+        while (!mainqueue.empty() & current == mainqueue.top()) {
+            mainqueue.pop();
         }
 #endif /* DISCARDDUPES */
     }
