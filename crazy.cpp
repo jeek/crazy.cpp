@@ -11,6 +11,16 @@
 #define CONCATENATION
 #define DISCARDDUPES
 #define SHOWNEGATIVES
+#define SQUAREROOT
+
+#ifdef SQUAREROOT
+bool is_perfect_square(int n) {
+    if (n < 0 or n == 1) // in this program, we don't care about 1
+        return false;
+    int root(round(sqrt(n)));
+    return (n == root * root) | (n == (root + 1) * (root + 1));
+}
+#endif /* SQUAREROOT */
 
 struct queueelement {
     std::vector< long long > elements;
@@ -116,10 +126,40 @@ int main(void) {
             }
             std::cout << std::endl;
         }
+        for (int i = 0 ; i < current.elements.size() ; i++) {
+#ifdef SQUAREROOT
+            // Square Root
+            if (is_perfect_square(current.elements[i])) {
+                temp = queueelement();
+                temp.elements.clear();
+                temp.strings.clear();
+                for (int j = 0 ; j < current.elements.size() ; j++) {
+                    if (j != i) {
+                        temp.elements.push_back(current.elements[j]);
+                        temp.strings.push_back(current.strings[j]);
+                    } else {
+                        if (j == i) {
+                            int root(round(sqrt(current.elements[j])));
+                            if ((root * root) == current.elements[j]) {
+                                temp.elements.push_back(root);
+                                temp.strings.push_back("sqrt(" + current.strings[j] + ")");
+                            }
+                            root++;
+                            if ((root * root) == current.elements[j]) {
+                                temp.elements.push_back(root);
+                                temp.strings.push_back("sqrt(" + current.strings[j] + ")");
+                            }
+                        }
+                    } 
+                }
+                mainqueue.push(temp);
+            }
+#endif /* SQUAREROOT */
+        }
         for (int i = 0 ; i + 1 < current.elements.size() ; i++) {
             // Addition
             temp = queueelement();
-            temp.elements.clear() ;
+            temp.elements.clear();
             temp.strings.clear();
             for (int j = 0 ; j + 1 < current.elements.size() ; j++) {
                 if (j < i) {
@@ -142,7 +182,7 @@ int main(void) {
 #ifdef SUBTRACTION
             // Subtraction
             temp = queueelement();
-            temp.elements.clear() ;
+            temp.elements.clear();
             temp.strings.clear();
             for (int j = 0 ; j + 1 < current.elements.size() ; j++) {
                 if (j < i) {
