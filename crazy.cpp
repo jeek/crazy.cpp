@@ -7,20 +7,6 @@
 #include <sstream>
 #include <stdlib.h>
 
-#define UPPERLIMIT 1000000000
-#define ADDITION
-#define SUBTRACTION
-#define MULTIPLICATION
-#define DIVISION
-#define EXPONENTS
-#define UNITARYNEGATION
-#define CONCATENATION
-#define DISCARDDUPES
-#define FACTORIAL
-#define SQUAREROOT
-//#define SHOWNEGATIVES
-//#define DEBUG
-
 #ifdef FACTORIAL
 bool sanefac(long long i) {
     if (i < 0 | i == 1 | i == 2) {
@@ -36,11 +22,11 @@ bool sanefac(long long i) {
     }
     return true;
 }
-bool fac(long long i) {
+long long fac(long long i) {
     long long answer = 1;
-    while (i > 0 & answer < UPPERLIMIT) {
-        answer *= i;
-        i -= 1;
+    while (i > 0) {
+        answer = answer * i;
+        i = i - 1;
     }
     return answer;
 }
@@ -79,7 +65,7 @@ struct queueelement {
             b += std::count(rhs.strings[i].begin(), rhs.strings[i].end(), '-');
         }
         if (a != b)
-            return a < b;
+            return a > b;
         return elements[0] < rhs.elements[0];
     }
     bool operator==(const queueelement& rhs) const
@@ -174,7 +160,7 @@ int main(void) {
                     }
                 }
             }
-            if (temp.strings.size() > 1) {
+            if (temp.elements.size() > 1) {
                 concatqueue.push_back(temp);
             }
         }
