@@ -3,12 +3,13 @@ COMPILER = clang++
 OPTIONS = -D"UPPERLIMIT = 1000000000" \
 	-DADDITION \
 	-DDISCARDDUPES \
+	-DDEBUG \
 	-DCONCATENATION \
-	-DMULTIPLICATION \
-	-DEXPONENTS \
-	-DSUBTRACTION \
-	-DDIVISION \
-	-DSQUAREROOT \
+#	-DMULTIPLICATION \
+#	-DEXPONENTS \
+#	-DSUBTRACTION \
+#	-DDIVISION \
+#	-DSQUAREROOT \
 	# -DFACTORIAL \
 	# -DUNITARYNEGATION \
 	# -DSHOWNEGATIVES \
@@ -23,6 +24,9 @@ crazy.exe:	crazy.cpp
 
 crazy:	crazy.cpp
 	$(COMPILER) -g $(OPTIONS) -o crazy crazy.cpp -ftemplate-depth=1048576
+
+.stxxl:
+	echo disk=`pwd`/stxxldisk,64G,syscall delete > .stxxl
 
 crazybig.exe:	crazy.cpp
 	i686-w64-mingw32-g++ -g -DUSESTXXL $(OPTIONS) -o crazybig.exe \
@@ -44,16 +48,16 @@ crazy.exe.increasing.out:	crazy.exe
 crazy.exe.decreasing.out:	crazy.exe
 	echo 9 8 7 6 5 4 3 2 1 | wine ./crazy.exe > crazy.exe.decreasing.out
 
-crazybig.increasing.out:	crazybig
+crazybig.increasing.out:	crazybig .stxxl
 	echo 1 2 3 4 5 6 7 8 9 | ./crazybig > crazybig.increasing.out
 
-crazybig.decreasing.out:	crazybig
+crazybig.decreasing.out:	crazybig .stxxl
 	echo 9 8 7 6 5 4 3 2 1 | ./crazybig > crazybig.decreasing.out
 
-crazybig.exe.increasing.out:	crazybig.exe
+crazybig.exe.increasing.out:	crazybig.exe .stxxl
 	echo 1 2 3 4 5 6 7 8 9 | wine ./crazybig.exe > crazybig.exe.increasing.out
 
-crazybig.exe.decreasing.out:	crazybig.exe
+crazybig.exe.decreasing.out:	crazybig.exe .stxxl
 	echo 9 8 7 6 5 4 3 2 1 | wine ./crazybig.exe > crazybig.exe.decreasing.out
 
 out:	crazy.increasing.out crazy.decreasing.out crazybig.increasing.out \
@@ -65,4 +69,4 @@ out.exe:	crazy.exe.increasing.out crazy.exe.decreasing.out \
 	# crazybig.exe.increasing.out crazybig.exe.decreasing.out
 
 clean:
-	rm -rf crazy crazy.exe crazy.*.out *~ crazybig crazybig.exe crazybig.*.out
+	rm -rf crazy crazy.exe crazy.*.out *~ crazybig crazybig.exe crazybig.*.out .stxxl stxxldisk

@@ -36,10 +36,10 @@ long long fac(long long i) {
 #endif /* FACTORIAL */
 
 #ifdef SQUAREROOT
-bool is_perfect_square(int n) {
+bool is_perfect_square(long long n) {
     if (n <= 1) // in this program, we don't care about 0 or 1
         return false;
-    int root(round(sqrt(n)));
+    long long root(round(sqrt(n)));
     return (n == root * root) | (n == (root + 1) * (root + 1));
 }
 #endif /* SQUAREROOT */
@@ -52,11 +52,11 @@ struct queueelement {
         if (elements.size() != rhs.elements.size()) {
             return elements.size() < rhs.elements.size();
         }
-        for (int i = 0 ; i < elements.size() ; i++) {
-            if (abs(elements[i]) != abs(rhs.elements[i])) {
-                return abs(elements[i]) < abs(rhs.elements[i]);
-            }
-        }
+//        for (int i = 0 ; i < elements.size() ; i++) {
+//            if (abs(elements[i]) != abs(rhs.elements[i])) {
+//                return abs(elements[i]) < abs(rhs.elements[i]);
+//            }
+//        }
         for (int i = 0 ; i < elements.size() ; i++) {
             if (elements[i] != rhs.elements[i]) {
                 return elements[i] < rhs.elements[i];
@@ -69,8 +69,42 @@ struct queueelement {
         }
         if (a != b)
             return a > b;
+        for (int i = 0 ; i < strings.size() ; i++) {
+            if (strings[i] != rhs.strings[i]) {
+                return strings[i] < rhs.strings[i];
+            }
+        }
         return 0 < 0;
-    }
+    };
+//    bool operator>(const queueelement& rhs) const
+//    {
+//        if (elements.size() != rhs.elements.size()) {
+//            return elements.size() > rhs.elements.size();
+//        }
+//        for (int i = 0 ; i < elements.size() ; i++) {
+//            if (abs(elements[i]) != abs(rhs.elements[i])) {
+//                return abs(elements[i]) > abs(rhs.elements[i]);
+//            }
+//        }
+//        for (int i = 0 ; i < elements.size() ; i++) {
+//            if (elements[i] != rhs.elements[i]) {
+//                return elements[i] > rhs.elements[i];
+//            }
+//        }
+//        size_t a = 0; size_t b = 0;
+//        for (int i = 0 ; i < strings.size() ; i++) {
+//            a += std::count(strings[i].begin(), strings[i].end(), '-');
+//            b += std::count(rhs.strings[i].begin(), rhs.strings[i].end(), '-');
+//        }
+//        if (a != b)
+//            return a < b;
+//        for (int i = 0 ; i < strings.size() ; i++) {
+//            if (strings[i] != rhs.strings[i]) {
+//                return strings[i] > rhs.strings[i];
+//            }
+//        }
+//        return 0 < 0;
+//    };
     bool operator==(const queueelement& rhs) const
     {
         if (elements.size() != rhs.elements.size()) {
@@ -81,9 +115,28 @@ struct queueelement {
                 return false;
             }
         }
+        for (int i = 0 ; i < strings.size() ; i++) {
+            if (strings[i] != rhs.strings[i]) {
+                return false;
+            }
+        }
         return true;
+    };
+};
+
+#ifdef DISCARDDUPES
+bool thesame(queueelement a, queueelement b) {
+    if (a.elements.size() != b.elements.size()) {
+        return false;
     }
-} ;
+    for (int i = 0 ; i < a.elements.size() ; i++) {
+        if (a.elements[i] != b.elements[i]) {
+             return false;
+        }
+    }
+    return true;
+}
+#endif /* DISCARDDUPES */
 
 void displayqueueelement(queueelement i) {
     for (std::vector<long long>::iterator it = i.elements.begin() ; it != i.elements.end() ; ++it) {
@@ -121,13 +174,14 @@ long long concatenatenumber(long long a, long long b) {
 struct ComparatorGreater
 {
     bool operator () (const queueelement& a, const queueelement& b) const {
-        return (b < a);
+        return (a < b);
     };
     queueelement min_value() const {
-        queueelement temp; temp.elements.push_back(0); temp.strings.push_back("0");
-//        return queueelement({0},{"0"});
-        const queueelement returnvalue = temp;
-        return returnvalue;
+//        queueelement temp;
+        //temp.elements.push_back(-1000000); temp.strings.push_back("-1000000");
+//        const queueelement returnvalue = temp;
+//        return returnvalue;
+        return queueelement();
     };
 };
 #endif /* USESTXXL */
@@ -151,7 +205,7 @@ int main(void) {
     std::string tempstring;
     std::vector< long long > elements;
     elements.clear();
-    int i = 0; int j = 0;
+    long long i = 0; long long j = 0;
     while (std::cin >> i) {
         elements.push_back(i);
     }
@@ -207,7 +261,10 @@ int main(void) {
 #endif /* CONCATENATION */
     int startsize = 10;
     while (! mainqueue.empty()) {
-        queueelement current = mainqueue.top();
+        queueelement current = queueelement(mainqueue.top());
+        std::cout << "! ";
+        displayqueueelement(current);
+        std::cout << std::endl;
         if (current.elements.size() < startsize) {
             startsize = current.elements.size();
             std::cerr << startsize << " ... " << mainqueue.size() << std::endl;
@@ -218,7 +275,7 @@ int main(void) {
         mainqueue.pop();
 
 #ifdef DISCARDDUPES
-        while (!mainqueue.empty() & (current == mainqueue.top())) {
+        while (!mainqueue.empty() & thesame(current, mainqueue.top())) {
             mainqueue.pop();
         }
 #endif /* DISCARDDUPES */
@@ -278,7 +335,7 @@ int main(void) {
                         temp.strings.push_back(current.strings[j]);
                     } else {
                         if (j == i) {
-                            int root(round(sqrt(current.elements[j])));
+                            long long root(round(sqrt(current.elements[j])));
                             if ((root * root) == current.elements[j]) {
                                 temp.elements.push_back(root);
                                 temp.strings.push_back("sqrt(" + current.strings[j] + ")");
