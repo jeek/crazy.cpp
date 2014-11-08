@@ -7,17 +7,44 @@
 #include <sstream>
 #include <stdlib.h>
 
-#define UPPERLIMIT 1000
+#define UPPERLIMIT 1000000000
 #define ADDITION
 #define SUBTRACTION
 #define MULTIPLICATION
 #define DIVISION
 #define EXPONENTS
+#define UNITARYNEGATION
 #define CONCATENATION
 #define DISCARDDUPES
-#define SHOWNEGATIVES
+#define FACTORIAL
 #define SQUAREROOT
+//#define SHOWNEGATIVES
 //#define DEBUG
+
+#ifdef FACTORIAL
+bool sanefac(long long i) {
+    if (i < 0 | i == 1 | i == 2) {
+        return false;
+    }
+    long long answer = 1;
+    while (i > 0 & answer < UPPERLIMIT) {
+        answer *= i;
+        i -= 1;
+    }
+    if (answer > UPPERLIMIT) {
+        return false;
+    }
+    return true;
+}
+bool fac(long long i) {
+    long long answer = 1;
+    while (i > 0 & answer < UPPERLIMIT) {
+        answer *= i;
+        i -= 1;
+    }
+    return answer;
+}
+#endif /* FACTORIAL */
 
 #ifdef SQUAREROOT
 bool is_perfect_square(int n) {
@@ -38,12 +65,12 @@ struct queueelement {
         }
         for (int i = 0 ; i < elements.size() ; i++) {
             if (abs(elements[i]) != abs(rhs.elements[i])) {
-                return abs(elements[i]) > abs(rhs.elements[i]);
+                return abs(elements[i]) < abs(rhs.elements[i]);
             }
         }
         for (int i = 0 ; i < elements.size() ; i++) {
             if (elements[i] != rhs.elements[i]) {
-                return elements[i] > rhs.elements[i];
+                return elements[i] < rhs.elements[i];
             }
         }
         size_t a = 0; size_t b = 0;
@@ -124,9 +151,9 @@ int main(void) {
     // Concatenation
     std::vector< queueelement > concatqueue;
     concatqueue.push_back(temp);
-    while (! concatqueue.empty()) {
-        queueelement current = concatqueue.back();
-        concatqueue.pop_back();
+    int k = 0;
+    while (k < concatqueue.size()) {
+        queueelement current = concatqueue[k];
         for (int i = 0 ; i + 1 < current.elements.size() ; i++) {
             temp = queueelement();
             temp.elements.clear();
@@ -148,12 +175,17 @@ int main(void) {
                 }
             }
             if (temp.strings.size() > 1) {
-                mainqueue.push(temp);
                 concatqueue.push_back(temp);
-//                std::sort(concatqueue.begin(), concatqueue.end());
-                std::unique(concatqueue.begin(), concatqueue.end());
             }
         }
+        k++;
+    }
+    std::sort(concatqueue.begin(), concatqueue.end());
+    std::unique(concatqueue.begin(), concatqueue.end());
+    k = 0;
+    while (k < concatqueue.size()) {
+        mainqueue.push(concatqueue[k]);
+        k++;
     }
 #endif /* CONCATENATION */
     int startsize = 10;
@@ -161,15 +193,15 @@ int main(void) {
         queueelement current = mainqueue.top();
         if (current.elements.size() < startsize) {
             startsize = current.elements.size();
-            std::cout << startsize << "..." << std::endl;
+            std::cerr << startsize << " ... " << mainqueue.size() << std::endl;
         }
 #ifdef DEBUG
-        std::cout << mainqueue.size() << " " << current.elements.size() << " !" << std::endl;
+//        std::cout << mainqueue.size() << " " << current.elements.size() << " !" << std::endl;
 #endif /* DEBUG */
         mainqueue.pop();
 
 #ifdef DISCARDDUPES
-        while (!mainqueue.empty() & current == mainqueue.top()) {
+        while (!mainqueue.empty() & (current == mainqueue.top())) {
             mainqueue.pop();
         }
 #endif /* DISCARDDUPES */
@@ -185,6 +217,37 @@ int main(void) {
             displayqueueelement(current);
         }
         for (int i = 0 ; i < current.elements.size() ; i++) {
+
+#ifdef UNITARYNEGATION
+            // Unitary Negation
+//            std::cout << current.strings[i][0] << std::endl;
+            if (current.strings[i][0] != '-') {
+                temp = queueelement();
+                temp.elements.clear();
+                temp.strings.clear();
+                for (int j = 0 ; j < current.elements.size() ; j++) {
+                    if (j != i) {
+                        temp.elements.push_back(current.elements[j]);
+                        temp.strings.push_back(current.strings[j]);
+                    } else {
+                        if (j == i) {
+                            temp.elements.push_back(-current.elements[j]);
+                            temp.strings.push_back('-' + current.strings[j]);
+                        }
+                    } 
+                }
+                mainqueue.push(temp);
+
+#ifdef DEBUG
+                std::cout << mainqueue.size() << " " ;
+                displayqueueelement(current);
+                std::cout << mainqueue.size() << " " ;
+                displayqueueelement(temp);
+                std::cout << std::endl;
+//                std::cout << "G" << std::endl;
+#endif /* DEBUG */
+            }
+#endif /* UNITARYNEGATION */
 
 #ifdef SQUAREROOT
             // Square Root
@@ -222,6 +285,34 @@ int main(void) {
 #endif /* DEBUG */
 
 #endif /* SQUAREROOT */
+
+#ifdef FACTORIAL
+            // Factorial
+            if (sanefac(current.elements[i])) {
+                temp = queueelement();
+                temp.elements.clear();
+                temp.strings.clear();
+                for (int j = 0 ; j < current.elements.size() ; j++) {
+                    if (j != i) {
+                        temp.elements.push_back(current.elements[j]);
+                        temp.strings.push_back(current.strings[j]);
+                    } else {
+                        if (j == i) {
+                            temp.elements.push_back(fac(current.elements[j]));
+                            temp.strings.push_back("fac(" + current.strings[j] + ")");
+                        }
+                    } 
+                }
+                mainqueue.push(temp);
+            }
+
+#ifdef DEBUG
+                displayqueueelement(current);
+                displayqueueelement(temp);
+                std::cout << std::endl;
+#endif /* DEBUG */
+
+#endif /* FACTORIAL */
 
 #ifdef ADDITION
         }
@@ -322,7 +413,6 @@ int main(void) {
 
 #ifdef DIVISION
             // Division
-//            std::cout << "i " << current.elements[i] << " " << current.elements[i+1] << std::endl;
             if ((current.elements[i + 1]) != 0 and current.elements[i] % current.elements[i + 1] == 0) {
                 temp = queueelement();
                 temp.elements.clear();
@@ -380,7 +470,7 @@ int main(void) {
             mainqueue.push(temp);
 
 #ifdef DEBUG
-                displayqueueelement(current);
+                displayqueueelement(current); 
                 displayqueueelement(temp);
                 std::cout << std::endl;
 #endif /* DEBUG */

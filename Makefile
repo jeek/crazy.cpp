@@ -9,5 +9,7 @@ crazy.increasing.out:	crazy
 crazy.decreasing.out:	crazy
 	echo 9 8 7 6 5 4 3 2 1 | ./crazy > crazy.decreasing.out
 
+out:	crazy.increasing.out crazy.decreasing.out
+
 clean:
-	rm -rf crazy *~ crazy.*.out
+	rm -rf crazy crazy.*.out
