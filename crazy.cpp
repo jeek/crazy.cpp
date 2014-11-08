@@ -69,7 +69,7 @@ struct queueelement {
         }
         if (a != b)
             return a > b;
-        return elements[0] < rhs.elements[0];
+        return 0 < 0;
     }
     bool operator==(const queueelement& rhs) const
     {
@@ -124,7 +124,10 @@ struct ComparatorGreater
         return (b < a);
     };
     queueelement min_value() const {
-        queueelement temp; temp.elements.clear(); temp.strings.clear(); return temp;
+        queueelement temp; temp.elements.push_back(0); temp.strings.push_back("0");
+//        return queueelement({0},{"0"});
+        const queueelement returnvalue = temp;
+        return returnvalue;
     };
 };
 #endif /* USESTXXL */
@@ -132,11 +135,8 @@ struct ComparatorGreater
 int main(void) {
 
 #ifdef USESTXXL
-    // use 64 GiB on main memory and 1 billion items at most
-    typedef stxxl::PRIORITY_QUEUE_GENERATOR<queueelement, ComparatorGreater, 256*1024, 1024*1024*1024>::result pq_type;
+    typedef stxxl::PRIORITY_QUEUE_GENERATOR<queueelement, ComparatorGreater, 64*1024*1024, 1024*1024>::result pq_type;
     typedef pq_type::block_type block_type;
-    // block_type::raw_size = 262144 bytes
-    // use 64 block read and write pools each to enable overlapping between I/O and computation
     const unsigned int mem_for_pools = 32 * 1024 * 1024;
     stxxl::read_write_pool<block_type> pool((mem_for_pools / 2) / block_type::raw_size, (mem_for_pools / 2) / block_type::raw_size);
     pq_type mainqueue(pool);

@@ -19,18 +19,18 @@ all:	crazy crazy.exe crazybig # crazybig.exe
 test:	out out.exe
 
 crazy.exe:	crazy.cpp
-	i686-w64-mingw32-g++ -g $(OPTIONS) -o crazy.exe crazy.cpp
+	i686-w64-mingw32-g++ -g $(OPTIONS) -o crazy.exe crazy.cpp -ftemplate-depth=1048576
 
 crazy:	crazy.cpp
-	$(COMPILER) -g $(OPTIONS) -o crazy crazy.cpp
+	$(COMPILER) -g $(OPTIONS) -o crazy crazy.cpp -ftemplate-depth=1048576
 
 crazybig.exe:	crazy.cpp
 	i686-w64-mingw32-g++ -g -DUSESTXXL $(OPTIONS) -o crazybig.exe \
-	crazy.cpp -lstxxl
+	crazy.cpp -lstxxl -ftemplate-depth=1048576
 
 crazybig:	crazy.cpp
 	$(COMPILER) -g -DUSESTXXL $(OPTIONS) -o crazybig crazy.cpp \
-	-lstxxl -lpthread
+	-lstxxl -lpthread -ftemplate-depth=1048576
 
 crazy.increasing.out:	crazy
 	echo 1 2 3 4 5 6 7 8 9 | ./crazy > crazy.increasing.out
