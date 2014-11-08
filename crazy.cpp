@@ -181,7 +181,7 @@ int main(void) {
 #ifndef SHOWNEGATIVES
         if (current.elements.size() == 1 & current.elements[0] < UPPERLIMIT & current.elements[0] >= 0 & seen.count(current.elements[0]) == 0) {
 #endif /* SHOWNEGATIVES */
-
+            seen.insert(current.elements[0]);
             displayqueueelement(current);
         }
         for (int i = 0 ; i < current.elements.size() ; i++) {
