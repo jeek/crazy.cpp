@@ -14,7 +14,9 @@ OPTIONS = -D"UPPERLIMIT = 1000000000" \
 	# -DSHOWNEGATIVES \
 	# -DDEBUG
 
-all:	crazy crazy.increasing.out crazy.decreasing.out crazy.exe crazy.exe.increasing.out crazy.exe.decreasing.out
+all:	crazy crazy.exe
+
+test:	crazy.increasing.out crazy.decreasing.out crazy.exe.increasing.out crazy.exe.decreasing.out
 
 crazy.exe:	crazy.cpp
 	i586-mingw32msvc-g++ $(OPTIONS) -o crazy.exe crazy.cpp
