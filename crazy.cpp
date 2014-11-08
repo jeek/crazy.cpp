@@ -6,6 +6,9 @@
 #include <math.h>    // pow
 #include <sstream>
 #include <stdlib.h>
+#ifdef USESTXXL
+#include <stxxl/priority_queue>
+#endif /* USESTXXL */
 
 #ifdef FACTORIAL
 bool sanefac(long long i) {
@@ -113,9 +116,37 @@ long long concatenatenumber(long long a, long long b) {
 }
 #endif /* CONCATENATION */
 
+#ifdef USESTXXL
+// comparison struct for priority queue where top() returns the smallest contained value:
+struct ComparatorGreater
+{
+    bool operator () (const queueelement& a, const queueelement& b) const {
+        return (b < a);
+    };
+    queueelement min_value() const {
+        queueelement temp; temp.elements.clear(); temp.strings.clear(); return temp;
+    };
+};
+#endif /* USESTXXL */
+
 int main(void) {
-    std::set< long long > seen;
+
+#ifdef USESTXXL
+    // use 64 GiB on main memory and 1 billion items at most
+    typedef stxxl::PRIORITY_QUEUE_GENERATOR<queueelement, ComparatorGreater, 256*1024, 1024*1024*1024>::result pq_type;
+    typedef pq_type::block_type block_type;
+    // block_type::raw_size = 262144 bytes
+    // use 64 block read and write pools each to enable overlapping between I/O and computation
+    const unsigned int mem_for_pools = 32 * 1024 * 1024;
+    stxxl::read_write_pool<block_type> pool((mem_for_pools / 2) / block_type::raw_size, (mem_for_pools / 2) / block_type::raw_size);
+    pq_type mainqueue(pool);
+#endif /* USESTXXL */
+
+#ifndef USESTXXL
     std::priority_queue< queueelement > mainqueue;
+#endif /* USESTXXL */
+
+    std::set< long long > seen;
     queueelement temp;
     std::string tempstring;
     std::vector< long long > elements;

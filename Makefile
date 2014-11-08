@@ -1,4 +1,4 @@
-COMPILER = g++
+COMPILER = clang++
 
 OPTIONS = -D"UPPERLIMIT = 1000000000" \
 	-DADDITION \
@@ -8,21 +8,29 @@ OPTIONS = -D"UPPERLIMIT = 1000000000" \
 	-DEXPONENTS \
 	-DSUBTRACTION \
 	-DDIVISION \
-	# -DSQUAREROOT \
+	-DSQUAREROOT \
 	# -DFACTORIAL \
 	# -DUNITARYNEGATION \
 	# -DSHOWNEGATIVES \
 	# -DDEBUG
 
-all:	crazy crazy.exe
+all:	crazy crazy.exe crazybig # crazybig.exe
 
-test:	crazy.increasing.out crazy.decreasing.out crazy.exe.increasing.out crazy.exe.decreasing.out
+test:	out out.exe
 
 crazy.exe:	crazy.cpp
-	i586-mingw32msvc-g++ $(OPTIONS) -o crazy.exe crazy.cpp
+	i686-w64-mingw32-g++ -g $(OPTIONS) -o crazy.exe crazy.cpp
 
 crazy:	crazy.cpp
-	$(COMPILER) $(OPTIONS) -o crazy crazy.cpp
+	$(COMPILER) -g $(OPTIONS) -o crazy crazy.cpp
+
+crazybig.exe:	crazy.cpp
+	i686-w64-mingw32-g++ -g -DUSESTXXL $(OPTIONS) -o crazybig.exe \
+	crazy.cpp -lstxxl
+
+crazybig:	crazy.cpp
+	$(COMPILER) -g -DUSESTXXL $(OPTIONS) -o crazybig crazy.cpp \
+	-lstxxl -lpthread
 
 crazy.increasing.out:	crazy
 	echo 1 2 3 4 5 6 7 8 9 | ./crazy > crazy.increasing.out
@@ -36,9 +44,25 @@ crazy.exe.increasing.out:	crazy.exe
 crazy.exe.decreasing.out:	crazy.exe
 	echo 9 8 7 6 5 4 3 2 1 | wine ./crazy.exe > crazy.exe.decreasing.out
 
-out:	crazy.increasing.out crazy.decreasing.out
+crazybig.increasing.out:	crazybig
+	echo 1 2 3 4 5 6 7 8 9 | ./crazybig > crazybig.increasing.out
 
-out.exe:	crazy.exe.increasing.out crazy.exe.decreasing.out
+crazybig.decreasing.out:	crazybig
+	echo 9 8 7 6 5 4 3 2 1 | ./crazybig > crazybig.decreasing.out
+
+crazybig.exe.increasing.out:	crazybig.exe
+	echo 1 2 3 4 5 6 7 8 9 | wine ./crazybig.exe > crazybig.exe.increasing.out
+
+crazybig.exe.decreasing.out:	crazybig.exe
+	echo 9 8 7 6 5 4 3 2 1 | wine ./crazybig.exe > crazybig.exe.decreasing.out
+
+out:	crazy.increasing.out crazy.decreasing.out crazybig.increasing.out \
+	crazybig.decreasing.out
+
+bigout:	crazybig.increasing.out crazybig.decreasing.out
+
+out.exe:	crazy.exe.increasing.out crazy.exe.decreasing.out \
+	# crazybig.exe.increasing.out crazybig.exe.decreasing.out
 
 clean:
-	rm -rf crazy crazy.exe crazy.*.out *~
+	rm -rf crazy crazy.exe crazy.*.out *~ crazybig crazybig.exe crazybig.*.out
