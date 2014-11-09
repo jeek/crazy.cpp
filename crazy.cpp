@@ -433,6 +433,39 @@ int main(int argc, char *argv[]) {
 
 #endif /* DIVISION */
 
+#ifdef REVERSEDIVISION
+            // Reverse Division
+            if ((current.elements[i]) != 0 and current.elements[i + 1] % current.elements[i] == 0) {
+                temp = queueelement();
+                temp.elements.clear();
+                temp.strings.clear();
+                for (int j = 0 ; j + 1 < current.elements.size() ; j++) {
+                    if (j < i) {
+                        temp.elements.push_back(current.elements[j]);
+                        temp.strings.push_back(current.strings[j]);
+                    } else {
+                        if (j == i) {
+                            temp.elements.push_back(current.elements[j + 1] / current.elements[j]);
+                            temp.strings.push_back("(" + current.strings[j] + " \\ " + current.strings[j + 1] + ")");
+                        } else {
+                            if (j + 1 > i) {
+                                temp.elements.push_back(current.elements[j + 1]);
+                                temp.strings.push_back(current.strings[j + 1]);
+                            }
+                        }
+                    }
+                }
+            }
+            mainqueue.push(temp);
+
+#ifdef DEBUG
+                displayqueueelement(current);
+                displayqueueelement(temp);
+                std::cout << std::endl;
+#endif /* DEBUG */
+
+#endif /* REVERSEDIVISION */
+
 #ifdef EXPONENTS
             // Exponents
             if (current.elements[i+1] >=0 & abs(current.elements[i+1]) * log10(abs(current.elements[i])) < log10(UPPERLIMIT)) {
