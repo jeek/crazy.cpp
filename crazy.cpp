@@ -175,13 +175,15 @@ int main(int argc, char *argv[]) {
         k++;
     }
 #endif /* CONCATENATION */
-    int startsize = 10;
+    int startsize = 0;
     while (! mainqueue.empty()) {
         queueelement current = mainqueue.top();
-        if (current.elements.size() < startsize) {
+#ifdef SHOWQUEUESTEPS
+        if (current.elements.size() != startsize) {
             startsize = current.elements.size();
             std::cerr << startsize << " ... " << mainqueue.size() << std::endl;
         }
+#endif /* SHOWQUEUESTEPS */
 #ifdef DEBUG
 //        std::cout << mainqueue.size() << " " << current.elements.size() << " !" << std::endl;
 #endif /* DEBUG */

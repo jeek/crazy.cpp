@@ -11,12 +11,18 @@ OPTIONS = -D"UPPERLIMIT = 1000000000" \
 	-DSQUAREROOT \
 	-DFACTORIAL \
 	-DUNITARYNEGATION \
+	# -DSHOWQUEUESTEPS \
 	# -DSHOWNEGATIVES \
 	# -DDEBUG
 
 all:	crazy crazy.exe
 
-test:	out out.exe
+test:	out out.exe new.out
+
+new.out:	crazy.cpp crazy new.py
+	make clean
+	make crazy
+	python new.py|bash|tee new.out
 
 crazy.exe:	crazy.cpp
 	i586-mingw32msvc-g++ -g $(OPTIONS) -o crazy.exe crazy.cpp
@@ -41,4 +47,4 @@ out:	crazy.increasing.out crazy.decreasing.out
 out.exe:	crazy.exe.increasing.out crazy.exe.decreasing.out
 
 clean:
-	rm -rf crazy crazy.exe crazy.*.out *~
+	rm -rf crazy crazy.exe crazy.*.out *~ new.out
