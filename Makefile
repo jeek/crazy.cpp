@@ -1,4 +1,4 @@
-COMPILER = g++
+COMPILER = clang++
 
 OPTIONS = -D"UPPERLIMIT = 1000000000" \
 	-DADDITION \
@@ -8,33 +8,33 @@ OPTIONS = -D"UPPERLIMIT = 1000000000" \
 	-DEXPONENTS \
 	-DSUBTRACTION \
 	-DDIVISION \
-	# -DSQUAREROOT \
-	# -DFACTORIAL \
-	# -DUNITARYNEGATION \
+	-DSQUAREROOT \
+	-DFACTORIAL \
+	-DUNITARYNEGATION \
 	# -DSHOWNEGATIVES \
 	# -DDEBUG
 
 all:	crazy crazy.exe
 
-test:	crazy.increasing.out crazy.decreasing.out crazy.exe.increasing.out crazy.exe.decreasing.out
+test:	out out.exe
 
 crazy.exe:	crazy.cpp
-	i586-mingw32msvc-g++ $(OPTIONS) -o crazy.exe crazy.cpp
+	i586-mingw32msvc-g++ -g $(OPTIONS) -o crazy.exe crazy.cpp
 
 crazy:	crazy.cpp
-	$(COMPILER) $(OPTIONS) -o crazy crazy.cpp
+	$(COMPILER) -g $(OPTIONS) -o crazy crazy.cpp
 
 crazy.increasing.out:	crazy
-	echo 1 2 3 4 5 6 7 8 9 | ./crazy > crazy.increasing.out
+	./crazy 1 2 3 4 5 6 7 8 9 > crazy.increasing.out
 
 crazy.decreasing.out:	crazy
-	echo 9 8 7 6 5 4 3 2 1 | ./crazy > crazy.decreasing.out
+	./crazy 9 8 7 6 5 4 3 2 1 > crazy.decreasing.out
 
 crazy.exe.increasing.out:	crazy.exe
-	echo 1 2 3 4 5 6 7 8 9 | wine ./crazy.exe > crazy.exe.increasing.out
+	wine ./crazy.exe 1 2 3 4 5 6 7 8 9 > crazy.exe.increasing.out
 
 crazy.exe.decreasing.out:	crazy.exe
-	echo 9 8 7 6 5 4 3 2 1 | wine ./crazy.exe > crazy.exe.decreasing.out
+	wine ./crazy.exe 9 8 7 6 5 4 3 2 1 > crazy.exe.decreasing.out
 
 out:	crazy.increasing.out crazy.decreasing.out
 

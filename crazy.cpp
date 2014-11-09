@@ -113,16 +113,17 @@ long long concatenatenumber(long long a, long long b) {
 }
 #endif /* CONCATENATION */
 
-int main(void) {
+int main(int argc, char *argv[]) {
     std::set< long long > seen;
     std::priority_queue< queueelement > mainqueue;
     queueelement temp;
     std::string tempstring;
     std::vector< long long > elements;
     elements.clear();
-    int i = 0; int j = 0;
-    while (std::cin >> i) {
-        elements.push_back(i);
+    int i = 1; int j = 0;
+    char *endptr; int base = 10;
+    while (i < argc) {
+        elements.push_back(std::strtoll(argv[i++], &endptr, base));
     }
     temp.elements = elements;
     temp.strings.clear();
