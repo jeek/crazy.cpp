@@ -1,4 +1,6 @@
-COMPILER = clang++
+COMPILER = g++ -std=gnu++0x
+
+SRC = crazyfast.cpp
 
 OPTIONS = -D"UPPERLIMIT = 1000000000" \
 	-DADDITION \
@@ -13,23 +15,23 @@ OPTIONS = -D"UPPERLIMIT = 1000000000" \
 	-DUNITARYNEGATION \
 	-DREVERSEDIVISION \
 	-DSHOWQUEUESTEPS \
-	# -DSHOWNEGATIVES \
 	# -DDEBUG
+	# -DSHOWNEGATIVES \
 
 all:	crazy crazy.exe
 
 test:	out out.exe new.out
 
-new.out:	crazy.cpp crazy new.py
+new.out:	$(SRC) crazy new.py
 	make clean
 	make crazy
 	python new.py|bash|tee new.out
 
-crazy.exe:	crazy.cpp
-	i586-mingw32msvc-g++ -g $(OPTIONS) -o crazy.exe crazy.cpp
+crazy.exe:	$(SRC)
+	i586-mingw32msvc-g++ -g $(OPTIONS) -o crazy.exe $(SRC)
 
-crazy:	crazy.cpp
-	$(COMPILER) -g $(OPTIONS) -o crazy crazy.cpp
+crazy:	$(SRC)
+	$(COMPILER) -g $(OPTIONS) -o crazy $(SRC)
 
 crazy.increasing.out:	crazy
 	./crazy 1 2 3 4 5 6 7 8 9 > crazy.increasing.out
