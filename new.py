@@ -1,8 +1,10 @@
-for i in xrange(10, 10 ** 9):
+from itertools import permutations
+
+for i in xrange(10, 10 ** 10):
     j = ""
-    for k in str(i):
-        j += k + " "
-    print './crazy ' + j  + ' | grep "^' + str(i) + ' " |head -1 &'
-    if (i % 10 != 0):
-        ii = str(i)[::-1]
-        print './crazy ' + j[::-1]  + ' | grep "^' + str(i) + ' " |head -1'
+    seen = set()
+    for k in permutations(str(i)):
+        if (k[0] != '0'):
+            if k not in seen:
+                seen.add(k)
+                print './crazy ' + " ".join(list(k))  + ' | grep "^' + str(i) + ' " |head -1 &'
