@@ -2,7 +2,7 @@ COMPILER = g++ -std=gnu++0x
 
 SRC = crazyfast.cpp
 # SRC = crazy.cpp
-# SORT = | sort -n
+SORT = | sort -n
 
 OPTIONS = -D"UPPERLIMIT = 1000000000" \
 	-DADDITION \
@@ -16,8 +16,8 @@ OPTIONS = -D"UPPERLIMIT = 1000000000" \
 	-DFACTORIAL \
 	-DUNITARYNEGATION \
 	-DREVERSEDIVISION \
+	-DDEBUG
 	# -DSHOWQUEUESTEPS \
-	# -DDEBUG
 	# -DSHOWNEGATIVES \
 
 all:	crazy crazy.exe
