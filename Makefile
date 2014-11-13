@@ -1,6 +1,6 @@
 COMPILER = g++ -std=gnu++0x
 
-SRC = crazyfast.cpp
+SRC = crazynew.cpp
 # SRC = crazy.cpp
 # SORT = | sort -n
 
@@ -13,8 +13,8 @@ OPTIONS = -D"UPPERLIMIT = 1000000000" \
 	-DSUBTRACTION \
 	-DDIVISION \
 	-DSQUAREROOT \
-	-DFACTORIAL \
 	-DUNITARYNEGATION \
+#	-DFACTORIAL \
 	# -DREVERSEDIVISION \
 	# -DDEBUG
 	# -DSHOWQUEUESTEPS \
@@ -33,7 +33,7 @@ crazy.exe:	$(SRC)
 	i586-mingw32msvc-g++ -g $(OPTIONS) -o crazy.exe $(SRC)
 
 crazy:	$(SRC)
-	$(COMPILER) -g $(OPTIONS) -o crazy $(SRC)
+	$(COMPILER) -fpermissive -g $(OPTIONS) -o crazy $(SRC)
 
 crazy.increasing.out:	crazy
 	./crazy 1 2 3 4 5 6 7 8 9 $(SORT) > crazy.increasing.out
