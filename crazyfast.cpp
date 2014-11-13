@@ -38,9 +38,47 @@ long long concatenate(long long x, long long y) {
         pow *= 10;
     return x * pow + y;        
 }
-                    
 
-void cprocess(record *left, record *right, std::vector< record* > &queue, std::vector< record* > &records, std::set<seenitem> &seen) {
+std::string display(record *current) {
+    std::string result = "";
+    if ((*current).oper == 'E') {
+        return std::to_string((*current).result);
+    }
+    if ((*current).oper == '+') {
+        return "(" + display((*current).left) + " + " + display((*current).right) + ")";
+    }
+    if ((*current).oper == '*') {
+        return "(" + display((*current).left) + " * " + display((*current).right) + ")";
+    }
+    if ((*current).oper == '-') {
+        return "(" + display((*current).left) + " - " + display((*current).right) + ")";
+    }
+    if ((*current).oper == '/') {
+        return "(" + display((*current).left) + " / " + display((*current).right) + ")";
+    }
+    if ((*current).oper == '\\') {
+        return "(" + display((*current).left) + " \\ " + display((*current).right) + ")";
+    }
+    if ((*current).oper == '^') {
+        return "(" + display((*current).left) + " ^ " + display((*current).right) + ")";
+    }
+    if ((*current).oper == 'S') {
+        return "sqrt(" + display((*current).left) + ")";
+    }
+    if ((*current).oper == 'F') {
+        return "(" + display((*current).left) + ")!";
+    }
+    if ((*current).oper == 'N') {
+        return "-" + display((*current).left);
+    }
+    std::cout << std::endl << (*current).oper << std::endl;
+    return "Error("+ std::to_string((*current).result) + ")";
+}
+                    
+#define QUEUEPUSH leftq[(*temp).upper].push_back(*temp); rightq[(*temp).lower].push_back(*temp);
+//#define QUEUEPUSH
+void cprocess(record *left, record *right, std::vector< record* > &queue, std::vector< record* > &records, std::set<seenitem> &seen, std::vector< std::vector< record > > &leftq, std::vector< std::vector< record > > &rightq) {
+    // Concatenation
 #ifdef DEBUG
     std::cout << "cprocess: " << (*left).result << " " << (*left).lower << " " << (*left).upper << " | " << (*right).result << " " << (*right).lower << " " << (*right).upper << std::endl;
 #endif /* DEBUG */
@@ -49,7 +87,27 @@ void cprocess(record *left, record *right, std::vector< record* > &queue, std::v
     }
     char *endptr; int base = 10;
     record *temp; int i; bool good;
-    // Concatenation
+    if ((*right).result == 0) {
+    temp = new record();
+    (*temp).left = left;
+    (*temp).right = right;
+    (*temp).oper = 'E';
+    (*temp).lower = (*left).lower;
+    (*temp).upper = (*right).upper;
+    (*temp).result = (*left).result * 10;
+//    if (seen.count(seenitem({(*temp).result, (*temp).lower, (*temp).upper})) == 0) {
+#ifdef DEBUG
+            std::cout << "C         " << (*temp).result << " " << (*temp).lower << " " << (*temp).upper << std::endl;
+#endif /* DEBUG */
+//        std::cout << "Q2" << queue.size() << std::endl;
+        queue.push_back(temp);
+//        std::cout << "Q3" << queue.size() << std::endl;
+//        records.push_back(temp);
+        seen.insert(seenitem({(*temp).result, (*temp).lower, (*temp).upper}));
+        QUEUEPUSH
+//    }
+        return;
+    }
     temp = new record();
     (*temp).left = left;
     (*temp).right = right;
@@ -57,18 +115,20 @@ void cprocess(record *left, record *right, std::vector< record* > &queue, std::v
     (*temp).lower = (*left).lower;
     (*temp).upper = (*right).upper;
     (*temp).result = concatenate((*left).result, (*right).result);
-    if (seen.count(seenitem({(*temp).result, (*temp).lower, (*temp).upper})) == 0) {
+//    if (seen.count(seenitem({(*temp).result, (*temp).lower, (*temp).upper})) == 0) {
 #ifdef DEBUG
             std::cout << "C         " << (*temp).result << " " << (*temp).lower << " " << (*temp).upper << std::endl;
 #endif /* DEBUG */
+//        std::cout << "Q5" << queue.size() << std::endl;
         queue.push_back(temp);
-        records.push_back(temp);
+//        std::cout << "Q6" << queue.size() << std::endl;
+//        records.push_back(temp);
         seen.insert(seenitem({(*temp).result, (*temp).lower, (*temp).upper}));
-    }
+        QUEUEPUSH
+//    }
 }
 
-void oprocess(record *left, std::vector< record* > &queue, std::vector< record* > &records, std::set<seenitem> &seen) {
-
+void oprocess(record *left, std::vector< record* > &queue, std::vector< record* > &records, std::set<seenitem> &seen, std::vector< std::vector< record > > &leftq, std::vector< std::vector< record > > &rightq) {
     char *endptr; int base = 10;
 #ifdef DEBUG
     std::cout << "oprocess: " << (*left).result << " " << (*left).lower << " " << (*left).upper << std::endl;
@@ -89,11 +149,13 @@ void oprocess(record *left, std::vector< record* > &queue, std::vector< record* 
             std::cout << "N         " << (*temp).result << " " << (*temp).lower << " " << (*temp).upper << std::endl;
 #endif /* DEBUG */
             queue.push_back(temp);
-            records.push_back(temp);
+//            records.push_back(temp);
             seen.insert(seenitem({(*temp).result, (*temp).lower, (*temp).upper}));
+            QUEUEPUSH
         }
     }
 #endif /* UNITARY NEGATION */
+#ifdef FACTORIAL
     // Factorial
     if ((*left).result == 0) {
         temp = new record();
@@ -108,8 +170,9 @@ void oprocess(record *left, std::vector< record* > &queue, std::vector< record* 
             std::cout << "!         " << (*temp).result << " " << (*temp).lower << " " << (*temp).upper << std::endl;
 #endif /* DEBUG */
             queue.push_back(temp);
-            records.push_back(temp);
+//            records.push_back(temp);
             seen.insert(seenitem({(*temp).result, (*temp).lower, (*temp).upper}));
+            QUEUEPUSH
         }
     }
     if ((*left).result > 2) {
@@ -132,11 +195,13 @@ void oprocess(record *left, std::vector< record* > &queue, std::vector< record* 
             std::cout << "!         " << (*temp).result << " " << (*temp).lower << " " << (*temp).upper << std::endl;
 #endif /* DEBUG */
                 queue.push_back(temp);
-                records.push_back(temp);
+//                records.push_back(temp);
                 seen.insert(seenitem({(*temp).result, (*temp).lower, (*temp).upper}));
+                QUEUEPUSH
             }
         }
     }
+#endif /* FACTORIAL */
 #ifdef SQUAREROOT
     // Sqrt
     if ((*left).result > 1) {
@@ -154,8 +219,9 @@ void oprocess(record *left, std::vector< record* > &queue, std::vector< record* 
             std::cout << "S         " << (*temp).result << " " << (*temp).lower << " " << (*temp).upper << std::endl;
 #endif /* DEBUG */
                 queue.push_back(temp);
-                records.push_back(temp);
+//                records.push_back(temp);
                 seen.insert(seenitem({(*temp).result, (*temp).lower, (*temp).upper}));
+                QUEUEPUSH
             }
         }
         if ((root + 1) * (root + 1) == (*left).result) {
@@ -171,15 +237,16 @@ void oprocess(record *left, std::vector< record* > &queue, std::vector< record* 
             std::cout << "S         " << (*temp).result << " " << (*temp).lower << " " << (*temp).upper << std::endl;
 #endif /* DEBUG */
                 queue.push_back(temp);
-                records.push_back(temp);
+//                records.push_back(temp);
                 seen.insert(seenitem({(*temp).result, (*temp).lower, (*temp).upper}));
+                QUEUEPUSH
             }
         }
     }
 #endif /* SQUAREROOT */
 }
 
-void process(record *left, record *right, std::vector< record* > &queue, std::vector< record* > &records, std::set<seenitem> &seen) {
+void process(record *left, record *right, std::vector< record* > &queue, std::vector< record* > &records, std::set<seenitem> &seen, std::vector< std::vector< record > > &leftq, std::vector< std::vector< record > > &rightq) {
     record *temp; int i; bool good;
 #ifdef DEBUG
     std::cout << " process: " << (*left).result << " " << (*left).lower << " " << (*left).upper << " | " << (*right).result << " " << (*right).lower << " " << (*right).upper << std::endl;
@@ -196,13 +263,16 @@ void process(record *left, record *right, std::vector< record* > &queue, std::ve
     if (seen.count(seenitem({(*temp).result, (*temp).lower, (*temp).upper})) == 0) {
 #ifdef DEBUG
         std::cout << "+         " << (*temp).result << " " << (*temp).lower << " " << (*temp).upper << std::endl;
+        std::cout << "L " << display(left) << std::endl;
+        std::cout << "R " << display(right) << std::endl;
+        std::cout << "O " << display(temp) << std::endl;
 #endif /* DEBUG */
         queue.push_back(temp);
-        records.push_back(temp);
+//        records.push_back(temp);
         seen.insert(seenitem({(*temp).result, (*temp).lower, (*temp).upper}));
+        QUEUEPUSH
     }
 #endif /* ADDITION */
-
 #ifdef MULTIPLICATION
     // Multiplication
     if (abs((*left).result) * abs((*right).result) < UPPERLIMIT) {
@@ -218,12 +288,12 @@ void process(record *left, record *right, std::vector< record* > &queue, std::ve
         std::cout << "*         " << (*temp).result << " " << (*temp).lower << " " << (*temp).upper << std::endl;
 #endif /* DEBUG */
             queue.push_back(temp);
-            records.push_back(temp);
+//            records.push_back(temp);
             seen.insert(seenitem({(*temp).result, (*temp).lower, (*temp).upper}));
+            QUEUEPUSH
         }
     }
 #endif /* MULTIPLICATION */
-
 #ifdef SUBTRACTION
     // Subtraction
     temp = new record();
@@ -238,8 +308,9 @@ void process(record *left, record *right, std::vector< record* > &queue, std::ve
         std::cout << "-         " << (*temp).result << " " << (*temp).lower << " " << (*temp).upper << std::endl;
 #endif /* DEBUG */
         queue.push_back(temp);
-        records.push_back(temp);
+//        records.push_back(temp);
         seen.insert(seenitem({(*temp).result, (*temp).lower, (*temp).upper}));
+        QUEUEPUSH
     }
 #endif /* SUBTRACTION */
 #ifdef DIVISION
@@ -258,8 +329,9 @@ void process(record *left, record *right, std::vector< record* > &queue, std::ve
         std::cout << "/         " << (*temp).result << " " << (*temp).lower << " " << (*temp).upper << std::endl;
 #endif /* DEBUG */
             queue.push_back(temp);
-            records.push_back(temp);
+//            records.push_back(temp);
             seen.insert(seenitem({(*temp).result, (*temp).lower, (*temp).upper}));
+            QUEUEPUSH
         }
       }
     }
@@ -280,8 +352,9 @@ void process(record *left, record *right, std::vector< record* > &queue, std::ve
         std::cout << "\\         " << (*temp).result << " " << (*temp).lower << " " << (*temp).upper << std::endl;
 #endif /* DEBUG */
             queue.push_back(temp);
-            records.push_back(temp);
+//            records.push_back(temp);
             seen.insert(seenitem({(*temp).result, (*temp).lower, (*temp).upper}));
+            QUEUEPUSH
         }
       }
     }
@@ -302,46 +375,14 @@ void process(record *left, record *right, std::vector< record* > &queue, std::ve
         std::cout << "^         " << (*temp).result << " " << (*temp).lower << " " << (*temp).upper << std::endl;
 #endif /* DEBUG */
             queue.push_back(temp);
-            records.push_back(temp);
+//            records.push_back(temp);
             seen.insert(seenitem({(*temp).result, (*temp).lower, (*temp).upper}));
+            QUEUEPUSH
         }
       }
     }
 #endif /* EXPONENTS */
 }
-
-std::string display(record *current) {
-    std::string result = "";
-    if ((*current).oper == 'E') {
-        return std::to_string((*current).result);
-    }
-    if ((*current).oper == '+') {
-        return "(" + display((*current).left) + " + " + display((*current).right) + ")";
-    }
-    if ((*current).oper == '*') {
-        return "(" + display((*current).left) + " * " + display((*current).right) + ")";
-    }
-    if ((*current).oper == '-') {
-        return "(" + display((*current).left) + " - " + display((*current).right) + ")";
-    }
-    if ((*current).oper == '/') {
-        return "(" + display((*current).left) + " / " + display((*current).right) + ")";
-    }
-    if ((*current).oper == '^') {
-        return "(" + display((*current).left) + " ^ " + display((*current).right) + ")";
-    }
-    if ((*current).oper == 'S') {
-        return "sqrt(" + display((*current).left) + ")";
-    }
-    if ((*current).oper == 'F') {
-        return "(" + display((*current).left) + ")!";
-    }
-    if ((*current).oper == 'N') {
-        return "-" + display((*current).left);
-    }
-    return "Error";
-}
-
 
 int main(int argc, char *argv[]) {
     
@@ -365,7 +406,7 @@ int main(int argc, char *argv[]) {
         (*temp).result = strtoll(argv[i], &endptr, base);
         (*temp).lower = i;
         (*temp).upper = i;
-        records.push_back(temp);
+//        records.push_back(temp);
         queue.push_back(temp);
         leftq[i].push_back(*temp);
         rightq[i].push_back(*temp);
@@ -376,17 +417,20 @@ int main(int argc, char *argv[]) {
         for (std::vector< record >::iterator queueiterator = (leftq[(*current).lower - 1]).begin() ; queueiterator < (leftq[(*current).lower - 1]).end() ; queueiterator++) {
             record *other = &(*queueiterator);
             if ((*other).lower != 1 | (*current).upper != (argc - 1)) {
-                cprocess(other, current, queue, records, seen);
+//               std::cout << " > " << (*other).result << " " << (*other).lower << " " << (*other).upper << " " << " < " << (*current).result << " " << (*current).lower << " " << (*current).upper <<  std::endl;
+//        std::cout << "Q1" << queue.size() << std::endl;
+                cprocess(other, current, queue, records, seen, leftq, rightq);
+//        std::cout << "Q4" << queue.size() << std::endl;
             }
-        }
-    }
-    for (int i = 0 ; i < queue.size() ; i++) {
-        record *current = queue[i];
-        for (std::vector< record >::iterator queueiterator = (rightq[(*current).upper + 1]).begin() ; queueiterator < (rightq[(*current).upper + 1]).end() ; queueiterator++) {
-            record *other = &(*queueiterator);
-            if ((*current).lower != 1 | (*other).upper != (argc - 1)) {
-                cprocess(current, other, queue, records, seen);
-            }
+//        }
+//    }
+//    for (int i = 0 ; i < queue.size() ; i++) {
+//        record *current = queue[i];
+//        for (std::vector< record >::iterator queueiterator = (rightq[(*current).upper + 1]).begin() ; queueiterator < (rightq[(*current).upper + 1]).end() ; queueiterator++) {
+//            record *other = &(*queueiterator);
+//            if ((*current).lower != 1 | (*other).upper != (argc - 1)) {
+//                cprocess(current, other, queue, records, seen, leftq, rightq);
+//            }
         }
     }
 #endif /* CONCATENATION */
@@ -398,22 +442,21 @@ int main(int argc, char *argv[]) {
         queue.pop_back();
         for (std::vector< record >::iterator queueiterator = (leftq[(*current).lower - 1]).begin() ; queueiterator < (leftq[(*current).lower - 1]).end() ; queueiterator++) {
             record *other = &(*queueiterator);
-            process(other, current, queue, records, seen);
+            process(other, current, queue, records, seen, leftq, rightq);
         }
         for (std::vector< record >::iterator queueiterator = (rightq[(*current).upper + 1]).begin() ; queueiterator < (rightq[(*current).upper + 1]).end() ; queueiterator++) {
             record *other = &(*queueiterator);
-            process(current, other, queue, records, seen);
+            process(current, other, queue, records, seen, leftq, rightq);
         }
-        oprocess(current, queue, records, seen);
-//        if ((*current).result >= 0 & (*current).lower == 1 & (*current).upper == argc - 1) {
-//            std::cout << (*current).result << " " << display(current) << std::endl;
+        oprocess(current, queue, records, seen, leftq, rightq);
+        if ((*current).result >= 0 & (*current).lower == 1 & (*current).upper == argc - 1) {
+            std::cout << (*current).result << " " << display(current) << std::endl;
+        }
+    }
+//    for (std::vector< record* >::iterator queueiterator = records.begin() ; queueiterator < records.end() ; queueiterator++) {
+//        if ((*(*queueiterator)).result >= 0 & (*(*queueiterator)).lower == 1 & (*(*queueiterator)).upper == argc - 1) {
+//            std::cout << (*(*queueiterator)).result << " " << display(*queueiterator) << std::endl;
 //        }
-    }
-    for (std::vector< record* >::iterator queueiterator = records.begin() ; queueiterator < records.end() ; queueiterator++) {
-        if ((*(*queueiterator)).result >= 0 & (*(*queueiterator)).lower == 1 & (*(*queueiterator)).upper == argc - 1) {
-            std::cout << (*(*queueiterator)).result << " " << display(*queueiterator) << std::endl;
-        }
-    }
-    std::cout << "FUCK. " << leftq.size() << " " << rightq.size() << std::endl;
+//    }
     return 0;
 }
