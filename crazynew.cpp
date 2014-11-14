@@ -81,13 +81,13 @@ int main(int argc, char *argv[]) {
     std::vector< std::set< long long > > rightq;
     std::set<seenitem> seen;
     int base = 10; char *endptr;
-    leftq.push_back(std::set<record>());
-    rightq.push_back(std::set<record>());
-    leftq.push_back(std::set<record>());
-    rightq.push_back(std::set<record>());
+    leftq.push_back(std::set<long long>());
+    rightq.push_back(std::set<long long>());
+    leftq.push_back(std::set<long long>());
+    rightq.push_back(std::set<long long>());
     for (int i = 1 ; i < argc; i++) {
-        leftq.push_back(std::set<record>());
-        rightq.push_back(std::set<record>());
+        leftq.push_back(std::set<long long>());
+        rightq.push_back(std::set<long long>());
         record temp;
         (temp).left = -1;
         (temp).right = -1;
@@ -97,51 +97,51 @@ int main(int argc, char *argv[]) {
         (temp).upper = i;
         seen.insert(seenitem({temp.result, temp.lower, temp.upper}));
         queue.push_back(temp);
-        leftq[i].insert(i);
-        rightq[i].insert(i);
+        leftq[i].insert(queue.size()-1);
+        rightq[i].insert(queue.size()-1);
 //        std::cout << temp.result << std::endl;
     }
 #ifdef CONCATENATION
     for (int i = 0 ; i < queue.size() ; i++) {
        for (int j = 0 ; j < queue.size() ; j++) {
            if ((queue[i].upper + 1) == (queue[j].lower)) {
-               if (seen.count(seenitem{concatenate(queue[j].result, queue[i].result), queue[i].lower, queue[j].upper}) == 0) {
-//                   std::cout << concatenate(queue[j].result, queue[i].result) << " " << queue[j].upper << " " << queue[i].lower << std::endl;
+               if ((queue[i].lower != 1 | queue[j].upper != (argc-1)) & seen.count(seenitem{concatenate(queue[j].result, queue[i].result), queue[i].lower, queue[j].upper}) == 0) {
+//                   std::cout << concatenate(queue[j].result, queue[i].result) << " " << queue[i].lower << " " << queue[j].upper << " "  << std::endl;
                    seen.insert(seenitem({concatenate(queue[j].result, queue[i].result), queue[i].lower, queue[j].upper}));
                    queue.push_back(record({queue[i].lower, queue[j].upper, concatenate(queue[j].result, queue[i].result), 'E', j, i}));
-                   leftq[queue[i].lower].insert(i);
-                   rightq[queue[j].upper].insert(j);
+                   leftq[queue[i].lower].insert(queue.size()-1);
+                   rightq[queue[j].upper].insert(queue.size()-1);
                }
            }
        }
     }
 #endif /* CONCATENATION */
     for (int i = 0 ; i < queue.size() ; i++) {
+        std::cout << queue.size() << " " << i << " " << queue[i].result << " " << queue[i].lower << " " << queue[i].upper << std::endl;
         if ((queue[i].lower == 1) & (queue[i].upper == (argc - 1)) & (queue[i].result < UPPERLIMIT)) {
             std::cout << queue[i].result << " " << display(queue, i) << std::endl;
         }
         //for (int j = 0 ; j < queue.size() ; j++) {
-        for (std::set<long long>::iterator it = leftq[queue[i].upper+1].begin() ; it < leftq[queue[i].upper+1].end(); ++it) {
+        for (std::set<long long>::iterator it = leftq[queue[i+1].upper].begin() ; it != (leftq[queue[i+1].upper]).end(); ++it) {
            long long j = *it;
-           if ((queue[i].upper + 1) == (queue[j].lower)) {
+           std::cout << "    " << j << " " << queue[j].result << " " << queue[j].lower << " " << queue[j].upper << std::endl;
+//           if ((queue[i].upper + 1) == (queue[j].lower)) {
 #ifdef ADDITION
-               if (seen.count(seenitem{queue[j].result + queue[i].result, queue[i].lower, queue[j].upper}) == 0) {
+               if (seen.count(seenitem{queue[i].result + queue[j].result, queue[i].lower, queue[j].upper}) < 5) {
 //                   std::cout << (queue[j].result + queue[i].result) << " " << queue[j].upper << " " << queue[i].lower << std::endl;
-                   seen.insert(seenitem({(queue[j].result+ queue[i].result), queue[i].lower, queue[j].upper}));
-                   queue.push_back(record({queue[i].lower, queue[j].upper, (queue[j].result+ queue[i].result), '+', j, i}));
-                   leftq[queue[i].lower].insert(i);
-                   rightq[queue[j].upper].insert(j);
+                   seen.insert(seenitem({(queue[i].result + queue[j].result), queue[i].lower, queue[j].upper}));
+                   queue.push_back(record({queue[i].lower, queue[j].upper, (queue[j].result + queue[i].result), '+', j, i}));
+                   leftq[queue[i].lower].insert(queue.size()-1);
+                   rightq[queue[j].upper].insert(queue.size()-1);
                }
 #endif /* ADDITION */
 #ifdef MULTIPLICATION
-               if (seen.count(seenitem{queue[j].result * queue[i].result, queue[i].lower, queue[j].upper}) == 0) {
-                 if ((queue[i].result * queue[j].result) < UPPERLIMIT) {
-//                   std::cout << (queue[j].result * queue[i].result) << " " << queue[j].upper << " " << queue[i].lower << std::endl;
-                   seen.insert(seenitem({(queue[j].result* queue[i].result), queue[i].lower, queue[j].upper}));
-                   queue.push_back(record({queue[i].lower, queue[j].upper, (queue[j].result* queue[i].result), '*', j, i}));
-                   leftq[queue[i].lower].insert(i);
-                   rightq[queue[j].upper].insert(j);
-                 }
+               if (seen.count(seenitem{queue[i].result * queue[j].result, queue[i].lower, queue[j].upper}) < 5) {
+//                   std::cout << (queue[j].result + queue[i].result) << " " << queue[j].upper << " " << queue[i].lower << std::endl;
+                   seen.insert(seenitem({(queue[i].result * queue[j].result), queue[i].lower, queue[j].upper}));
+                   queue.push_back(record({queue[i].lower, queue[j].upper, (queue[j].result * queue[i].result), '*', j, i}));
+                   leftq[queue[i].lower].insert(queue.size()-1);
+                   rightq[queue[j].upper].insert(queue.size()-1);
                }
 #endif /* MULTIPLICATION */
 #ifdef EXPONENTS
@@ -155,7 +155,7 @@ int main(int argc, char *argv[]) {
 //                 }
 //               }
 #endif /* EXPONENTS */
-           }            
+//           }            
         }
     }
 }

@@ -8,12 +8,12 @@ OPTIONS = -D"UPPERLIMIT = 1000000000" \
 	-DADDITION \
 	-DDISCARDDUPES \
 	-DCONCATENATION \
-	-DMULTIPLICATION \
 	-DEXPONENTS \
 	-DSUBTRACTION \
 	-DDIVISION \
 	-DSQUAREROOT \
 	-DUNITARYNEGATION \
+#	-DMULTIPLICATION \
 #	-DFACTORIAL \
 	# -DREVERSEDIVISION \
 	# -DDEBUG
@@ -33,7 +33,7 @@ crazy.exe:	$(SRC)
 	i586-mingw32msvc-g++ -g $(OPTIONS) -o crazy.exe $(SRC)
 
 crazy:	$(SRC)
-	$(COMPILER) -fpermissive -g $(OPTIONS) -o crazy $(SRC)
+	$(COMPILER) -g $(OPTIONS) -o crazy $(SRC)
 
 crazy.increasing.out:	crazy
 	./crazy 1 2 3 4 5 6 7 8 9 $(SORT) > crazy.increasing.out
